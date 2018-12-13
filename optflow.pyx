@@ -19,10 +19,10 @@ cdef extern from 'EPPM/bao_flow_patchmatch_multiscale_cuda.h':
 cpdef eppm(np.ndarray[np.float64_t, ndim=3, mode="c"] im0, np.ndarray[np.float64_t, ndim=3, mode="c"] im1):
     """
     Calculates the optical flow between images im0 and im1 using the CUDA accelerated code of
-    
+
     Bao, Linchao, Qingxiong Yang, and Hailin Jin. Fast edge-preserving patchmatch for large displacement optical flow.
     IEEE Conference on Computer Vision and Pattern Recognition. 2014.
-    
+
     :param im0: Image 0 (NxMx3)
     :param im1: Image 1 (NxMx3)
     :return: Flow field (NxMx2)
@@ -86,51 +86,3 @@ cpdef eppm(np.ndarray[np.float64_t, ndim=3, mode="c"] im0, np.ndarray[np.float64
         free(v_p)
 
     return np.dstack((u, v))
-
-cpdef brox(np.ndarray[np.float64_t, ndim=2, mode="c"] im0_d, np.ndarray[np.float64_t, ndim=2, mode="c"] im1_d,
-           alpha = 0.197, gamma = 50.0, scale_factor = 0.8, inner_iterations = 5, outer_iterations = 150,
-           solver_iterations = 10):
-    """
-    Calculates the optical flow between images im0 and im1 using the CUDA accelerated OpenCV code of
-    
-    Brox, Thomas, et al. High accuracy optical flow estimation based on a theory for warping.
-    European conference on computer vision. 2004.
-    
-    :param im0: Image 0 (NxM)
-    :param im1: Image 1 (NxM)
-    :param alpha: alpha = 0.197
-    :param gamma: gamma = 50.0
-    :param scale_factor: scale_factor = 0.8
-    :param inner_iterations: inner_iterations = 5
-    :param outer_iterations: outer_iterations = 150
-    :param solver_iterations: solver_iterations = 10
-    :return: Flow field (NxMx2)
-    """
-    cdef np.ndarray[np.float32_t, ndim=2] im0 = im0_d.astype(np.float32)
-    cdef np.ndarray[np.float32_t, ndim=2] im1 = im1_d.astype(np.float32)
-
-    assert im0.shape[0] == im1.shape[0] and im0.shape[1] == im1.shape[1]
-
-    cdef unsigned int h = im0.shape[0]
-    cdef unsigned int w = im0.shape[1]
-
-    cdef Mat m_im0
-    cdef GpuMat g_im0
-    cdef Mat m_im1
-    cdef GpuMat g_im1
-
-    cdef Mat flow = Mat(h, w, CV_32FC2)
-    cdef GpuMat g_flow = GpuMat(h, w, CV_32FC2)
-
-    pyopencv_to(<PyObject*> im0, m_im0)
-    g_im0.upload(m_im0)
-    pyopencv_to(<PyObject*> im1, m_im1)
-    g_im1.upload(m_im1)
-
-    cdef Ptr[BroxOpticalFlow] brox = BroxOpticalFlow.create(
-        alpha, gamma, scale_factor, inner_iterations, outer_iterations, solver_iterations)
-
-    brox.get().calc(g_im0, g_im1, g_flow)
-
-    g_flow.download(flow)
-    return <object> pyopencv_from(flow)
