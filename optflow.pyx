@@ -8,45 +8,6 @@ from libc.stdlib cimport malloc, free
 
 np.import_array()
 
-cdef extern from 'src/pyopencv_converter.cpp':
-    #mrc689 April 20,2017
-    cdef PyObject*pyopencv_from(const Mat& m)
-    cdef bool pyopencv_to(PyObject*o, Mat& m)
-
-cdef extern from 'opencv2/core/core.hpp':
-    cdef int CV_8UC1
-    cdef int CV_32FC1
-    cdef int CV_32FC2
-    cdef int CV_32FC3
-
-cdef extern from 'opencv2/core/core.hpp' namespace 'cv':
-    cdef cppclass Mat:
-        Mat() except +
-        Mat(int, int, int) except +
-        int cols
-        int rows
-
-cdef extern from 'opencv2/core/cvstd.hpp' namespace 'cv':
-    cdef cppclass Ptr[T]:
-        Ptr() except +
-        T*get()
-
-cdef extern from 'opencv2/core/cuda.hpp' namespace 'cv::cuda':
-    cdef cppclass GpuMat:
-        GpuMat() except +
-        GpuMat(int, int, int) except +
-        void upload(Mat arr) except +
-        void download(Mat dst) const
-        int cols
-        int rows
-
-cdef extern from 'opencv2/cudaoptflow.hpp' namespace 'cv::cuda':
-    cdef cppclass BroxOpticalFlow:
-        @ staticmethod
-        Ptr[BroxOpticalFlow] create(double, double, double, int, int, int)
-
-        void calc(GpuMat, GpuMat, GpuMat) except +
-
 cdef extern from 'EPPM/bao_flow_patchmatch_multiscale_cuda.h':
     cdef cppclass bao_flow_patchmatch_multiscale_cuda:
         void init(int h, int w)
