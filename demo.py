@@ -18,17 +18,12 @@ def color_code(flow, maxmag=10):
 
     return bgr
 
-
 im0 = cv2.imread('examples/frame10.png')
 im1 = cv2.imread('examples/frame11.png')
 
 im0_g = cv2.cvtColor(im0, cv2.COLOR_RGB2GRAY)
 im1_g = cv2.cvtColor(im1, cv2.COLOR_RGB2GRAY)
 
-f = optflow.brox(im0_g / 255., im1_g / 255.)
-cv2.imshow('brox', color_code(f))
-
 f = optflow.eppm(im0 / 255., im1 / 255.)
-cv2.imshow('eppm', color_code(f))
-
-cv2.waitKey(0)
+colored = ((color_code(f, maxmag=20) * 255.).astype(np.uint8)
+cv2.imwrite('eppm.jpg' colored)
