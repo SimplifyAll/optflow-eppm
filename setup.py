@@ -79,13 +79,6 @@ class custom_build_ext(build_ext):
         customize_compiler_for_nvcc(self.compiler)
         build_ext.build_extensions(self)
 
-
-opencv_libs_str = subprocess.check_output('pkg-config --libs opencv'.split()).decode()
-opencv_incs_str = subprocess.check_output('pkg-config --cflags opencv'.split()).decode()
-
-opencv_libs = [str(lib) for lib in opencv_libs_str.strip().split()]
-opencv_incs = [str(inc) for inc in opencv_incs_str.strip().split()]
-
 eppm_src = ['EPPM/bao_pmflow_census_kernel.cu', 'EPPM/bao_pmflow_refine_kernel.cu',
             'EPPM/bao_flow_patchmatch_multiscale_cuda.cpp',
             'EPPM/bao_flow_patchmatch_multiscale_kernel.cu', 'EPPM/bao_pmflow_kernel.cu',
@@ -94,10 +87,10 @@ eppm_src = ['EPPM/bao_pmflow_census_kernel.cu', 'EPPM/bao_pmflow_refine_kernel.c
 extensions = [
     Extension('optflow',
               sources=['optflow.pyx'] + eppm_src,
-              include_dirs=[numpy.get_include(), cuda['home'] + '/include', 'EPPM', 'EPPM/basic'] + opencv_incs,
+              include_dirs=[numpy.get_include(), cuda['home'] + '/include', 'EPPM', 'EPPM/basic'],
               language='c++',
-              extra_link_args=opencv_libs + ['-lcudart', '-L' + cuda['home'] + '/lib', '-L' + cuda['home'] + '/lib64',
-                                             '-L' + cuda['home'] + '/lib/x86_64-linux-gnu', '-g'],
+              extra_link_args=['-lcudart', '-L' + cuda['home'] + '/lib', '-L' + cuda['home'] + '/lib64',
+                               '-L' + cuda['home'] + '/lib/x86_64-linux-gnu', '-g'],
               extra_compile_args={'gcc': ['-g'],
                                   'nvcc': ['-arch=sm_30', '--ptxas-options=-v', '-c', '--compiler-options', "'-fPIC'"]},
               )
