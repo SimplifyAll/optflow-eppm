@@ -101,4 +101,7 @@ setup(
     version='1.0',
     ext_modules=cythonize(extensions),
     cmdclass={'build_ext': custom_build_ext},
+    install_requires=[
+            'numpy',
+    ]
 )
