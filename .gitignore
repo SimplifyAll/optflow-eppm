@@ -39,6 +39,3 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
-
-#3rdparty
-EPPM

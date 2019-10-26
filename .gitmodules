@@ -1,0 +1,3 @@
+[submodule "EPPM"]
+	path = EPPM
+	url = https://github.com/SimplifyAll/EPPM
